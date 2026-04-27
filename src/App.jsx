@@ -1,62 +1,104 @@
+// src/App.jsx
+import { useState, useCallback } from 'react'
 import { Canvas } from '@react-three/fiber'
-import { OrbitControls } from '@react-three/drei'
-import { Physics, RigidBody, CuboidCollider, BallCollider, CapsuleCollider } from '@react-three/rapier'
-import { Suspense, useRef } from 'react'
-
+import { OrbitControls, Environment, Grid } from '@react-three/drei'
+import { Physics, RigidBody } from '@react-three/rapier'
+import { PhysicsObject } from './components/PhysicsObject'
 
 export default function App() {
+  const [objects, setObjects] = useState([])
+  const [shape, setShape] = useState('box')
+  const [gravity, setGravity] = useState(-9.81)
+  const [gravityKey, setGravityKey] = useState(0) // changing this remounts Physics
 
-  const body = useRef();
+  // Drop object at a random position above the scene
+  const dropObject = useCallback(() => {
+    setObjects(prev => [
+      ...prev,
+      {
+        id: Date.now(),
+        shape,
+        position: [
+          (Math.random() - 0.5) * 4,
+          6,
+          (Math.random() - 0.5) * 4,
+        ],
+      },
+    ])
+  }, [shape])
 
-    // Apply an instant force (like a throw)
-  body.current.applyImpulse({ x: 0, y: 5, z: 0 }, true)
+  const clearAll = () => setObjects([])
 
-  // Apply a torque (spin it)
-  body.current.applyTorqueImpulse({ x: 1, y: 0, z: 0 }, true)
+  // Changing gravity requires remounting the Physics component
+  const applyGravity = (val) => {
+    setGravity(val)
+    setGravityKey(k => k + 1)
+    setObjects([])  // clear objects when resetting gravity
+  }
 
   return (
-    <Canvas camera={{ position: [0, 5, 10], fov: 50 }}
-      style={{ width: '100%', height: '100%' }}>
-        <Suspense>
-          <ambientLight intensity={0.5} />
-          <directionalLight position={[10, 10, 5]} intensity={1} />
-          <OrbitControls />
-          <Physics gravity={[0, -9.81, 0]} debug>
+    <div style={{ position: 'fixed', inset: 0 }}>
+      {/* Controls UI */}
+      <div style={{
+        position: 'absolute',
+        top: 12,
+        left: 12,
+        right: 12,
+        zIndex: 10,
+        padding: '12px 16px',
+        display: 'flex',
+        flexWrap: 'wrap',
+        gap: 12,
+        alignItems: 'center',
+        background: 'rgba(17, 17, 17, 0.85)',
+        color: '#eee',
+        borderRadius: 10,
+        backdropFilter: 'blur(6px)'
+      }}>
+        <select value={shape} onChange={e => setShape(e.target.value)}>
+          <option value="box">Box</option>
+          <option value="sphere">Sphere</option>
+          <option value="cylinder">Cylinder</option>
+        </select>
+        <button onClick={dropObject}>Drop</button>
+        <button onClick={clearAll}>Clear</button>
+        <label>
+          Gravity
+          <input type="range" min={-20} max={0} step={0.5} value={gravity}
+            onChange={e => applyGravity(Number(e.target.value))} />
+          {gravity.toFixed(1)}
+        </label>
+        <span style={{ marginLeft: 'auto', opacity: 0.5 }}>{objects.length} objects</span>
+      </div>
 
-            {/* Dynamic Box */}
-            <RigidBody type="dynamic" position={[0, 5, 0]}>
-              <mesh>
-                <boxGeometry />
-                <meshStandardMaterial color="coral" />
-              </mesh>
-            </RigidBody>
+      {/* 3D Canvas */}
+      <Canvas
+        shadows
+        camera={{ position: [0, 10, 20], fov: 70 }}
+        style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', display: 'block' }}
+      >
+        <ambientLight intensity={0.4} />
+        <directionalLight position={[5, 10, 5]} intensity={1.5} castShadow
+          shadow-mapSize={[2048, 2048]} />
+        <Environment preset="city" />
+        <OrbitControls makeDefault target={[0, 1, 0]} />
+        <Grid infiniteGrid sectionColor="#555" cellColor="#333" />
 
-            <RigidBody type="dynamic" position={[2, 5, 0]}>
-              <CuboidCollider args={[1, 1, 1]} />
-              <mesh>
-                <boxGeometry args={[1, 1, 1]} />
-                <meshStandardMaterial color="lightblue" />
-              </mesh>
-            </RigidBody>
+        <Physics key={gravityKey} gravity={[0, gravity, 0]}>
+          {/* Floor */}
+          <RigidBody type="fixed" friction={0.8}>
+            <mesh receiveShadow position={[0, -0.25, 0]}>
+              <boxGeometry args={[20, 0.5, 20]} />
+              <meshStandardMaterial color="#2d2d2d" />
+            </mesh>
+          </RigidBody>
 
-            <RigidBody type="dynamic" ref={body} position={[4, 5, 0]}>
-              <CuboidCollider args={[1, 1, 1]} />
-              <mesh>
-                <boxGeometry args={[1, 1, 1]} />
-                <meshStandardMaterial color="lightblue" />
-              </mesh>
-            </RigidBody>
-
-
-            {/* Ground */}
-            <RigidBody type="fixed">
-              <mesh position={[0, -2, 0]}>
-                <boxGeometry args={[10, 0.5, 10]} />
-                <meshStandardMaterial color="#999" />
-              </mesh>
-            </RigidBody>
-          </Physics>
-        </Suspense>
-    </Canvas>
+          {/* Dropped objects */}
+          {objects.map(obj => (
+            <PhysicsObject key={obj.id} shape={obj.shape} position={obj.position} />
+          ))}
+        </Physics>
+      </Canvas>
+    </div>
   )
 }
