@@ -1,16 +1,52 @@
-# React + Vite
+# Physics Sandbox
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Work in progress.
 
-Currently, two official plugins are available:
+This project is a small 3D physics playground built with React, Vite, Three.js, and Rapier. It lets you drop basic shapes into a scene, change the gravity, and watch the simulation react in real time.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## What it does right now
 
-## React Compiler
+- Drop boxes, spheres, and cylinders into the scene.
+- Change the gravity with a slider.
+- Clear all spawned objects.
+- Orbit around the scene and inspect the simulation from different angles.
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## Tech Stack
 
-## Expanding the ESLint configuration
+- React 19
+- Vite
+- @react-three/fiber
+- @react-three/drei
+- @react-three/rapier
+- Three.js
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+## Getting Started
+
+```bash
+npm install
+npm run dev
+```
+
+If you want to build for production:
+
+```bash
+npm run build
+```
+
+## Project Status
+
+This is a work in progress. The current codebase is a foundation for experimenting with physics interactions, object spawning, and scene presentation. Expect rough edges, missing polish, and features to change.
+
+## Next Steps
+
+- Add drag and drop interaction for objects.
+- Improve the UI with better controls and layout.
+- Add more shapes and spawn presets.
+- Tune materials, lighting, and camera behavior.
+- Game modes, stacking, bowling, basketball
+
+## Notes
+
+The project currently favors experimentation over completeness, so the README may evolve as the sandbox grows.
+
+

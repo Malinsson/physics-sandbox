@@ -45,7 +45,7 @@ export function PhysicsObject({ shape = 'box', position }) {
       <mesh 
       onClick={handleClick}
       onPointerDown={handlePointerDown}
-      onPointerEnter={() => setActive(!active)}
+      onPointerEnter={() => setActive(true)}
       onPointerLeave={() => setActive(false)}
       scale={active ? 1.5 : 1} 
       castShadow>

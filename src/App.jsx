@@ -83,8 +83,12 @@ export default function App() {
         style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', display: 'block' }}
       >
         <ambientLight intensity={0.4} />
-        <directionalLight position={[5, 10, 5]} intensity={1.5} castShadow
-          shadow-mapSize={[2048, 2048]} />
+        <directionalLight 
+        position={[5, 10, 5]} 
+        intensity={1.5} 
+        castShadow
+        shadow-mapSize={[2048, 2048]} 
+        />
         <Environment preset="city" />
         <OrbitControls makeDefault target={[0, 1, 0]} />
         <Grid infiniteGrid sectionColor="#555" cellColor="#333" />
