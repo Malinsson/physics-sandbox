@@ -1,5 +1,5 @@
 // src/components/PhysicsObject.jsx
-import { useRef } from 'react'
+import { useRef, useState } from 'react'
 import { RigidBody } from '@react-three/rapier'
 
 const SHAPES = {
@@ -13,7 +13,7 @@ const SHAPES = {
   },
   cylinder: {
     geometry: <cylinderGeometry args={[0.4, 0.4, 1, 12]} />,
-    collider: 'hull',  // hull = auto-fit convex hull, good for cylinders
+    collider: 'hull',
   },
 }
 
@@ -23,6 +23,7 @@ export function PhysicsObject({ shape = 'box', position }) {
   const bodyRef = useRef()
   const color = COLORS[Math.floor(Math.random() * COLORS.length)]
   const { geometry, collider } = SHAPES[shape]
+  const [ active, setActive ] = useState(false)
 
   function handleClick(e) {
     e.stopPropagation()
@@ -34,9 +35,20 @@ export function PhysicsObject({ shape = 'box', position }) {
     )
   }
 
+  function handlePointerDown(e) {
+    e.stopPropagation()
+    // On pointer down, we could implement dragging logic here
+  }
+
   return (
     <RigidBody ref={bodyRef} position={position} colliders={collider} restitution={0.4} friction={0.7}>
-      <mesh onClick={handleClick} castShadow>
+      <mesh 
+      onClick={handleClick}
+      onPointerDown={handlePointerDown}
+      onPointerEnter={() => setActive(!active)}
+      onPointerLeave={() => setActive(false)}
+      scale={active ? 1.5 : 1} 
+      castShadow>
         {geometry}
         <meshStandardMaterial color={color} />
       </mesh>

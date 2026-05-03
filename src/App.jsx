@@ -60,14 +60,19 @@ export default function App() {
           <option value="sphere">Sphere</option>
           <option value="cylinder">Cylinder</option>
         </select>
+
         <button onClick={dropObject}>Drop</button>
         <button onClick={clearAll}>Clear</button>
+
+
+        {/* Make gravity presets instead */}
         <label>
           Gravity
           <input type="range" min={-20} max={0} step={0.5} value={gravity}
             onChange={e => applyGravity(Number(e.target.value))} />
           {gravity.toFixed(1)}
         </label>
+
         <span style={{ marginLeft: 'auto', opacity: 0.5 }}>{objects.length} objects</span>
       </div>
 
