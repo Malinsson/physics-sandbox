@@ -10,6 +10,7 @@ export default function App() {
   const [shape, setShape] = useState('box')
   const [gravity, setGravity] = useState(-9.81)
   const [gravityKey, setGravityKey] = useState(0) // changing this remounts Physics
+  const [draggingObjectId, setDraggingObjectId] = useState(null)
 
   // Drop object at a random position above the scene
   const dropObject = useCallback(() => {
@@ -90,7 +91,7 @@ export default function App() {
         shadow-mapSize={[2048, 2048]} 
         />
         <Environment preset="city" />
-        <OrbitControls makeDefault target={[0, 1, 0]} />
+        <OrbitControls makeDefault enabled={draggingObjectId === null} target={[0, 1, 0]} />
         <Grid infiniteGrid sectionColor="#555" cellColor="#333" />
 
         <Physics key={gravityKey} gravity={[0, gravity, 0]}>
@@ -104,7 +105,13 @@ export default function App() {
 
           {/* Dropped objects */}
           {objects.map(obj => (
-            <PhysicsObject key={obj.id} shape={obj.shape} position={obj.position} />
+            <PhysicsObject
+              key={obj.id}
+              shape={obj.shape}
+              position={obj.position}
+              onDragStart={() => setDraggingObjectId(obj.id)}
+              onDragEnd={() => setDraggingObjectId(currentId => (currentId === obj.id ? null : currentId))}
+            />
           ))}
         </Physics>
       </Canvas>
